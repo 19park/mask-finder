@@ -1,5 +1,5 @@
 export default {
-    getState(state) {
-        return state.data;
+    GET_SEARCH(state) {
+        return state.search;
     }
 };

@@ -8,7 +8,8 @@
                     <v-row align="center">
                         <v-col class="d-flex" cols="12" sm="4">
                             <v-select
-                                v-model="search.city"
+                                :value="search.city"
+                                @input="updateCity"
                                 :items="getCity"
                                 item-text="AREA_NAME1"
                                 item-value="TYPE_CODE1"
@@ -19,7 +20,9 @@
                         </v-col>
                         <v-col class="d-flex" cols="12" sm="4">
                             <v-select
-                                v-model="search.district"
+                                :value="search.district"
+                                @input="updateDistrict"
+                                @change="doFetchMask"
                                 :items="getDistrict"
                                 item-text="AREA_NAME2"
                                 item-value="TYPE_CODE2"
@@ -30,9 +33,10 @@
                         </v-col>
                         <v-col class="d-flex" cols="12" sm="4">
                             <v-select
-                                v-model="search.neigh"
-                                :items="getNeigh"
+                                :value="search.neigh"
+                                @input="updateNeigh"
                                 @change="doFetchMask"
+                                :items="getNeigh"
                                 item-text="AREA_NAME3"
                                 item-value="TYPE_CODE3"
                                 label="읍·면·동"
@@ -85,6 +89,7 @@
 </template>
 
 <script>
+    import {mapState} from 'vuex';
     import {
         mask,
         area
@@ -95,11 +100,6 @@
         data() {
             return {
                 overlay: false,
-                search: {
-                    city: null,
-                    district: null,
-                    neigh: null
-                },
                 area: {
                     city: [],
                     district: [],
@@ -111,6 +111,7 @@
             };
         },
         computed: {
+            ...mapState(['search']),
             getCity() {
                 const getList = this.area.city;
                 getList.unshift({TYPE_CODE1: null, AREA_NAME1: '선택하세요'});
@@ -129,19 +130,19 @@
         },
         watch: {
             'search.city'(val) {
-                this.search.district = null;
-                this.search.neigh = null;
+                this.$store.commit('SET_DISTRICT', null);
+                this.$store.commit('SET_NEIGH', null);
                 this.area.district = [];
                 this.area.neigh = [];
+                this.list.items = [];
 
-                if (val) this.doFetchDistrict(val);
+                if (val) this.doFetchDistrict();
             },
             'search.district'(val) {
-                this.search.neigh = null;
+                this.$store.commit('SET_NEIGH', null);
                 this.area.neigh = [];
 
-                this.doFetchMask();
-                if (val) this.doFetchNeigh(val);
+                if (val) this.doFetchNeigh();
             }
         },
         methods: {
@@ -192,41 +193,62 @@
 
             // 시,도 정보 가져오기
             doFetchCity() {
-                area
+                return area
                     .fetchCity()
                     .then(res => res.data)
-                    .then(async (list) => {
+                    .then(list => {
                         if (list.length) {
-                            this.search.city = list[0].TYPE_CODE1;
                             this.area.city = list;
-
-                            this.doFetchDistrict(list[0].TYPE_CODE1);
+                        } else {
+                            this.area.city = [];
                         }
                     }).catch(console.log);
             },
             // 시, 군 정보 가져오기
-            doFetchDistrict(code) {
-                area
-                    .fetchDistrict(code)
+            doFetchDistrict() {
+                return area
+                    .fetchDistrict(this.search.city)
                     .then(res => res.data)
                     .then(list => {
                         if (list.length) {
-                            this.search.district = list[0].TYPE_CODE2;
                             this.area.district = list;
+                        } else {
+                            this.area.district = [];
                         }
                     }).catch(console.log);
             },
             // 읍면동 정보 가져오기
-            doFetchNeigh(code) {
-                area
-                    .fetchNeigh(code)
-                    .then(res => {
-                        this.area.neigh = res.data;
+            doFetchNeigh() {
+                return area
+                    .fetchNeigh(this.search.district)
+                    .then(res => res.data)
+                    .then(list => {
+                        if (list.length) {
+                            this.area.neigh = list;
+                        } else {
+                            this.area.neigh = [];
+                        }
                     }).catch(console.log);
+            },
+
+            updateCity(e) {
+                this.$store.commit('SET_CITY', e);
+            },
+
+            updateDistrict(e) {
+                this.$store.commit('SET_DISTRICT', e);
+            },
+
+            updateNeigh(e) {
+                this.$store.commit('SET_NEIGH', e);
             }
         },
-        created() {
-            this.doFetchCity();
+        async created() {
+            await this.doFetchCity();
+            await this.doFetchDistrict();
+            await this.doFetchNeigh();
+
+            this.doFetchMask();
         }
     };
 </script>
