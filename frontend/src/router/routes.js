@@ -1,10 +1,9 @@
 // 공통레이아웃
 import Layout from '@/components/Layout';
 
-// 메인페이지
+// pages
 import Main from '@/pages/Main';
-
-// 404
+import About from '@/pages/About';
 import NotFound from '@/pages/NotFound';
 
 export default [
@@ -14,8 +13,13 @@ export default [
         children: [
             {
                 path: '',
-                name: '메인메뉴',
+                name: '리스트',
                 component: Main
+            },
+            {
+                path: 'about',
+                name: 'About',
+                component: About
             }
         ]
     },

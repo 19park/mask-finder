@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   host: 'localhost',
   port: 3306,
   user: 'root',
-  password: 'password',
+  password: '!qkrwjdghks1',
   database: 'park'
 });
 // Connect
@@ -29,7 +29,7 @@ router.get('/:type', function (req, res) {
       setQuery = 'select TYPE_CODE2, AREA_NAME2 from area_info where TYPE_CODE1 = \''+ req.query.code +'\' group by TYPE_CODE2';
       break;
     case '3':
-      setQuery = 'select TYPE_CODE3, AREA_NAME3 from area_info where TYPE_CODE3 = \''+ req.query.code +'\' group by TYPE_CODE3';
+      setQuery = 'select TYPE_CODE3, AREA_NAME3 from area_info where TYPE_CODE2 = \''+ req.query.code +'\' group by TYPE_CODE3';
       break;
     default:
       res.status(404).send('잘못된 접근입니다.');

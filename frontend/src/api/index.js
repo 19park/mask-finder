@@ -37,13 +37,13 @@ export const area = {
     fetchDistrict(code) { // 구 정보
         return api.request({
             method: 'get',
-            url: `/area/2?code=${code}`
+            url: `/area/2?code=${encodeURIComponent(code)}`
         });
     },
     fetchNeigh(code) { // 동 정보
         return api.request({
             method: 'get',
-            url: `/area/3?code=${code}`
+            url: `/area/3?code=${encodeURIComponent(code)}`
         });
     }
 };
