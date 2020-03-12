@@ -131,14 +131,14 @@
             'search.city'(val) {
                 this.search.district = null;
                 this.search.neigh = null;
-                this.list.district = [];
-                this.list.neigh = [];
+                this.area.district = [];
+                this.area.neigh = [];
 
                 if (val) this.doFetchDistrict(val);
             },
             'search.district'(val) {
                 this.search.neigh = null;
-                this.list.neigh = [];
+                this.area.neigh = [];
 
                 this.doFetchMask();
                 if (val) this.doFetchNeigh(val);
