@@ -58,7 +58,7 @@
             <template v-for="(item, index) in list.items">
                 <v-list-item
                     :key="item.code"
-                    @click="() => {}"
+                    @click="doOpenDetail(item)"
                 >
                     <v-list-item-content>
                         <v-list-item-title>{{item.name}}</v-list-item-title>
@@ -85,6 +85,8 @@
         <v-overlay :value="overlay">
             <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
+
+        <Detail ref="detailView"/>
     </v-container>
 </template>
 
@@ -94,6 +96,9 @@
         mask,
         area
     } from '@/api';
+
+    // detail view
+    import Detail from '@/pages/Detail';
 
     export default {
         name: "Main",
@@ -144,6 +149,9 @@
 
                 if (val) this.doFetchNeigh();
             }
+        },
+        components: {
+            Detail
         },
         methods: {
             getStatCount(stat) {
@@ -241,6 +249,11 @@
 
             updateNeigh(e) {
                 this.$store.commit('SET_NEIGH', e);
+            },
+
+            // 판매처 상세정보
+            doOpenDetail(item) {
+                this.$refs.detailView.doOpen(item);
             }
         },
         async created() {
