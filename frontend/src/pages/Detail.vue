@@ -1,6 +1,8 @@
 <template>
     <v-bottom-sheet v-model="sheet"
-                    :eager="true">
+                    :eager="true"
+                    persistent
+    >
         <v-sheet style="border-top: 2px solid #fff;">
             <v-card class="mx-auto">
                 <v-list-item>
