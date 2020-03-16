@@ -19,7 +19,7 @@ connection.connect(function (err) {
   }
 });
 
-router.get('/:type', function (req, res) {
+router.get('/area/:type', function (req, res) {
   let setQuery = '';
   switch (req.params.type) {
     case '1':

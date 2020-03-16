@@ -1,26 +1,48 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const OPEN_API_URL = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1";
 
-var indexRouter = require('./routes/index');
-var areaRouter = require('./routes/area');
+const createError = require('http-errors');
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const {createProxyMiddleware} = require("http-proxy-middleware");
 
-var app = express();
+const indexRouter = require('./routes/index');
+const areaRouter = require('./routes/area');
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+const app = express();
+const history = require('connect-history-api-fallback');
+
+// CORS 설정
+app.use(cors());
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
 
+app.use(
+    createProxyMiddleware("/openapi", {
+      target: OPEN_API_URL,
+      secure: false,
+      changeOrigin: true,
+      cookiePathRewrite: "/",
+      cookieDomainRewrite: "",
+      logLevel: "debug",
+      pathRewrite: {
+        '^/openapi':''
+      },
+      onProxyRes: function(proxyRes, req, res) {
+        proxyRes.headers["Access-Control-Allow-Origin"] = "*";
+      }
+    })
+);
+app.use(history());
 app.use('/', indexRouter);
-app.use('/area', areaRouter);
+app.use('/api', areaRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
